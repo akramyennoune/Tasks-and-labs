@@ -4,7 +4,7 @@ This repository contains the hands-on projects and case studies I completed as p
 
 Projects
 
- Botium Toys — Internal Security Audit
+ 1-Botium Toys — Internal Security Audit
 
 A full internal security audit for a fictional small business (Botium Toys), conducted using the NIST Cybersecurity Framework. Includes a scope and goals definition, asset inventory, controls and compliance checklist (PCI DSS / GDPR), findings, and prioritized recommendations.
 
@@ -24,6 +24,21 @@ Regulatory compliance analysis (PCI DSS, GDPR)
 Security controls evaluation (technical, physical, administrative)
 
 Documentation and professional reporting
+
+2- Activity: Analyze network attacks:
+
+ Describing an event typically requires presenting your evidence and explaining how you came to your decision. All patterns you notice in the logs and data are critical in determining the source and the type of network attack. The more practice you have identifying these patterns, the easier it will be to spot network attacks as they are occurring. This will allow you to respond to incidents more quickly and efficiently.
+
+ [analyse-network-attacks](./Analyse network attacks.md)
+
+ Skills Demonstrated:
+
+ incident response 
+
+ network analysis
+
+ type of attacks
+
 
 
 
