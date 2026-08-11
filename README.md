@@ -12,7 +12,7 @@ A full internal security audit for a fictional small business (Botium Toys), con
 📄 
 
 
-[botium-toys-security-audit](./botium_toys_security_audit)
+[botium-toys-security-audit](./botium_toys_security_audit.md)
 
 Skills Demonstrated:
 
