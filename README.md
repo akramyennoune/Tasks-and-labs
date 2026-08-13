@@ -39,6 +39,16 @@ Documentation and professional reporting
 
  type of attacks
 
+3- Activity: Apply OS hardening techniques
+In this activity, i will take on the role of a cybersecurity analyst working for a company that hosts the cooking website, yummyrecipesforme.com. Visitors to the website experience a security issue when loading the main webpage. my job is to investigate, identify, document, and recommend a solution to the security problem. 
 
+[os-hardening](./OS-hardening-1.md)
 
+Skills Demonstrated:
+
+investigation skills
+
+hardening techniques
+
+tcpdump logs
 
