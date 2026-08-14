@@ -52,3 +52,11 @@ hardening techniques
 
 tcpdump logs
 
+
+4-Analysis of network hardening:
+
+The organization recently experienced a major data breach, which compromised the safety of their customers’ personal information, such as names and addresses. Your organization wants to implement strong network hardening practices that can be performed consistently to prevent attacks and breaches in the future. 
+
+[network-hardening](./network-hardening.md)
+
+
