@@ -1,4 +1,4 @@
-# 🛡️ Google Cybersecurity Certificate — Projects
+#  Google Cybersecurity Certificate — Projects
 
 This repository contains the hands-on projects and case studies I completed as part of the **Google Cybersecurity Professional Certificate**. Each project applies core cybersecurity concepts — risk assessment, compliance frameworks, network security, and incident response — to realistic business scenarios.
 
@@ -53,7 +53,5 @@ Following a major data breach that compromised customer personal information (na
 ##  About This Repository
 These projects were completed as part of my transition into cybersecurity, targeting a **SOC (Security Operations Center) analyst** role. Each case study reflects practical, scenario-based problem solving rather than purely theoretical exercises.
 
----
 
-⭐ Feel free to explore each project's markdown file for the full write-up, findings, and recommendations.
 
