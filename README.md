@@ -46,6 +46,16 @@ Following a major data breach that compromised customer personal information (na
 - Preventive security controls
 
 ---
+[NIST-csf-incident-response](./NIST-csf-ir.md)
+Acting as a cybersecurity analyst investigating a security incident at a design organization, this activity applies the four phases of the NIST Incident Response Lifecycle — Preparation, Detection and Analysis, Containment/Eradication/Recovery, and Post-Incident Activity — to document the incident, the response actions taken, and lessons learned.
+
+Skills demonstrated:
+
+Incident response documentation (incident handler's journal)
+Applying the NIST Incident Response Lifecycle
+Root cause and impact analysis
+Lessons-learned reporting
+
 
 ##  Tools & Frameworks Referenced
 `NIST CSF` · `PCI DSS` · `GDPR` · `tcpdump` · `Linux` · `Network Security`
