@@ -57,8 +57,22 @@ Root cause and impact analysis
 Lessons-learned reporting
 
 
+
+
+
 ##  Tools & Frameworks Referenced
 `NIST CSF` · `PCI DSS` · `GDPR` · `tcpdump` · `Linux` · `Network Security`
+
+
+
+### 5. [Linux-commands](./Linux-commands.md)
+
+
+
+
+
+
+
 
 ##  About This Repository
 These projects were completed as part of my transition into cybersecurity, targeting a **SOC (Security Operations Center) analyst** role. Each case study reflects practical, scenario-based problem solving rather than purely theoretical exercises.
