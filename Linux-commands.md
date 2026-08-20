@@ -74,4 +74,141 @@ Wrapped up with `clear` to reset the terminal view.
 **Takeaway:** Nothing here is advanced, but this is the muscle memory layer — knowing how the shell interprets input and returns output (or throws an error) before moving on to anything more complex like scripting or log parsing. Also a good reminder that command-line math like this is genuinely useful for quick triage calculations (false positive rates, volume projections) instead of pulling out a calculator or spreadsheet mid-shift.
 
 ---
+
+# Linux File Navigation, grep, and File Management — Lab Notes
+
+Continuing my SOC analyst prep (Google Cybersecurity Certificate). This batch of labs covered navigating a Linux directory structure, reading file contents, filtering with grep and piping, and basic file/directory management (create, move, remove, edit).
+
+## Lab 1: Navigating directories and reading files
+
+Scenario was investigating files under `/home/analyst` — the kind of thing you'd actually do when pulling a user access report during an investigation.
+
+Started with the basics of orienting myself:
+
+```
+pwd
+ls
+```
+
+`pwd` confirms the working directory, `ls` lists what's in it. From `/home/analyst` I moved into the reports directory:
+
+```
+cd /home/analyst/reports
+ls
+```
+
+That showed a `users` subdirectory (along with the other report folders). Moved into it and read a user file:
+
+```
+cd /home/analyst/reports/users
+ls
+cat Q1_added_users.txt
+```
+
+`cat` dumps the whole file to the terminal — useful for quickly checking a user list for a specific employee's department or ID without opening anything in a GUI.
+
+Then navigated over to the logs directory and checked the start of a log file instead of the whole thing:
+
+```
+cd /home/analyst/logs
+ls
+head server_logs.txt
+```
+
+`head` defaults to the first 10 lines, which is exactly what you want when you're skimming a log for warning/error entries without scrolling through the entire file.
+
+**Takeaway:** `cd`, `pwd`, `ls`, `cat`, and `head` cover most of what you need to move through a filesystem and pull relevant content out of files quickly — which matters a lot when you're working entirely through a remote shell with no GUI.
+
+## Lab 2: Filtering with grep and piping
+
+Same file structure, but this time the goal was searching rather than just reading.
+
+First, filtering a log file down to just the error lines:
+
+```
+cd /home/analyst/logs
+grep error server_logs.txt
+```
+
+`grep` searches for a string and only prints matching lines — a lot faster than reading the whole log to manually pick out errors.
+
+Next, finding files by name pattern using piping:
+
+```
+cd /home/analyst/reports/users
+ls | grep Q1
+```
+
+This pipes the output of `ls` into `grep`, so instead of grep searching file contents, it's filtering the list of filenames itself — in this case, anything with "Q1" in the name. Did the same thing again for "access":
+
+```
+ls | grep access
+```
+
+Then searched inside specific files for specific data:
+
+```
+grep jhill Q2_deleted_users.txt
+grep "Human Resources" Q4_added_users.txt
+```
+
+The second one needed quotes around "Human Resources" since it's two words — without quotes, grep would treat "Human" and "Resources" as separate arguments instead of one search string.
+
+**Takeaway:** grep plus piping is the difference between manually scanning files and actually querying them. Being able to pull "every line with X" or "every filename containing Y" out of a directory full of logs and reports is a core part of triage — you're rarely reading everything start to finish, you're searching for what matters.
+
+## Lab 3: File and directory management
+
+This one was less about reading data and more about basic housekeeping — creating, moving, and removing files and directories, plus editing a file directly in the shell.
+
+Created a new subdirectory for future log storage:
+
+```
+mkdir logs
+ls
+```
+
+Removed a directory that was no longer needed:
+
+```
+rm -r temp
+ls
+```
+
+(`-r` for recursive, since removing a directory means removing everything inside it too.)
+
+Moved a file from one directory to another:
+
+```
+cd notes
+mv Q3patches.txt ../reports/
+```
+
+`mv` handles both moving and renaming in Linux — there's no separate "move" vs "rename" command, it's the same operation depending on whether the destination path changes the name or not.
+
+Removed a single file:
+
+```
+rm tempnotes.txt
+```
+
+Created a new empty file:
+
+```
+touch tasks.txt
+```
+
+`touch` is normally used to update a file's timestamp, but if the file doesn't exist yet it creates it empty — handy for quickly scaffolding a file before editing it.
+
+Then opened it in nano to actually add content:
+
+```
+nano tasks.txt
+```
+
+Typed in a couple of lines, then saved and exited with `CTRL+X`, confirmed the save with `Y`, and confirmed the filename with `ENTER`. (Normally you'd use `CTRL+O` to save and `CTRL+X` to exit, but in a browser-based shell `CTRL+O` gets intercepted by the browser itself, so `CTRL+X` → `Y` → `ENTER` is the workaround.) Cleared the screen afterward since nano can leave some leftover text artifacts in a web terminal, then confirmed the file contents with `cat`.
+
+**Takeaway:** `mkdir`, `rm`, `mv`, `touch`, and basic nano usage round out the file management side of working in a shell. Combined with navigation and grep from the earlier labs, this covers a decent chunk of what you'd actually be doing day to day investigating or organizing files on a Linux system with no GUI to fall back on.
+
+---
 *Environment: Debian-based Linux, Bash shell*
+
