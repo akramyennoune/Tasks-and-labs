@@ -35,8 +35,8 @@ Of everything assessed, only four controls were confirmed in place: **firewall, 
 
 | Control | Status | Notes |
 |---|---|---|
-| CCTV | ✅ In place | Deters and detects unauthorized physical access across the premises |
-| Locks (office/storefront/warehouse) | ✅ In place | Well-implemented, restricts access to company assets |
+| CCTV |  In place | Deters and detects unauthorized physical access across the premises |
+| Locks (office/storefront/warehouse) |  In place | Well-implemented, restricts access to company assets |
 
 Physical security here isn't the problem. The gaps are almost entirely on the technical side.
 
@@ -44,11 +44,11 @@ Physical security here isn't the problem. The gaps are almost entirely on the te
 
 | Control | Status | Notes |
 |---|---|---|
-| Firewall | ✅ In place | First line of defense against unauthorized traffic |
-| Intrusion Detection System (IDS) | ❌ Missing | No automated way to catch abnormal or malicious traffic — a real blind spot |
-| Encryption | ❌ Missing | Customer and payment data isn't encrypted at rest or in transit |
-| Backups | ❌ Missing | No recovery path if ransomware, hardware failure, or data loss hits |
-| Password management | ❌ Missing | No formal policy — opens the door to weak, reused, or guessable passwords |
+| Firewall |  In place | First line of defense against unauthorized traffic |
+| Intrusion Detection System (IDS) |  Missing | No automated way to catch abnormal or malicious traffic — a real blind spot |
+| Encryption |  Missing | Customer and payment data isn't encrypted at rest or in transit |
+| Backups |  Missing | No recovery path if ransomware, hardware failure, or data loss hits |
+| Password management |  Missing | No formal policy — opens the door to weak, reused, or guessable passwords |
 
 Four out of five technical controls I checked simply aren't there. Individually, each of these gaps is bad. Together, they compound — no encryption plus no IDS means an attacker could both get in *and* walk away with usable data, and nobody would necessarily notice until it's too late.
 
