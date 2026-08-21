@@ -1,46 +1,42 @@
-# Incident Report Analysis — DoS Attack via ICMP Flood
+# Cybersecurity Incident Report — SYN Flood DDoS Attack
 
-*Incident analysis structured around the NIST Cybersecurity Framework (Identify, Protect, Detect, Respond, Recover)*
+*Traffic-log analysis of a network interruption caused by a SYN flood*
 
-## Summary
+## Section 1: Identifying the Attack Type
 
-This morning the organization experienced an attack that took down the internal network for roughly two hours. The system stopped responding after being hit with a massive flood of incoming packets, and all signs point to a deliberate attempt to disrupt operations rather than a random spike in traffic.
+The server was unable to keep up with an overwhelming number of SYN requests, which flooded it and caused a cascade of failed TCP connections. Based on the pattern in the logs, this points to a **SYN flood** — a specific form of **Distributed Denial of Service (DDoS) attack.**
 
-Digging into it, we found that a malicious actor sent a flood of ICMP pings into the network through a firewall that had never been properly configured to handle rate limiting on that kind of traffic. With nothing in place to catch or throttle it, the flood was enough to overwhelm the network — a classic denial-of-service (DoS) attack.
+The logs show the source IP `203.0.113.0` sending a large volume of failed SYN requests into the network. What makes this a *distributed* denial of service rather than a plain DoS is the use of a botnet — many devices working together to overwhelm the target — as opposed to a DoS attack, which relies on a single device. That distinction matters operationally too: a DDoS is much harder to block with a simple IP ban, since the traffic isn't coming from one predictable source.
 
-## Identify
+Notably, the logs show a completely normal, successful three-way handshake *before* the attack began. The network was functioning as expected right up until the flood started, at which point everything went down.
 
-When the network services team audited the systems, the cause became clear pretty quickly: an incoming flood of ICMP packets, consistent with a "ping of death" style attack, had overwhelmed the server to the point where it simply stopped responding. This wasn't a subtle intrusion — it was a volume-based attack that took advantage of the fact that nothing was filtering or rate-limiting ICMP traffic at the perimeter.
+## Section 2: How the Attack Disrupted the Website
 
-## Protect
+### Before the attack — a normal handshake
 
-To close the gap that let this happen, the network security team rolled out several changes:
+The three-way handshake completed successfully and looked exactly as it should:
 
-- **Firewall rate limiting** — a new rule to cap the rate of incoming ICMP packets, so a flood like this can't overwhelm the network the same way again.
-- **Source IP verification** — checking incoming ICMP packets for spoofed source addresses, which also helps guard against smurf attacks and on-path (man-in-the-middle) attacks.
-- **Network monitoring** — software to flag abnormal traffic patterns as they happen, rather than finding out after the fact.
-- **IDS/IPS** — deployed to filter out ICMP traffic that shows suspicious characteristics before it ever reaches the network.
+1. **SYN** — the source IP (`198.51.100.23`) sent a TCP request to the destination (`192.0.2.1`), initiating the connection.
+2. **SYN/ACK** — the destination replied, acknowledging the request and synchronizing back.
+3. **ACK** — the source IP finalized the handshake with an acknowledgment.
 
-## Detect
+After that, a `GET` request went through normally — this was legitimate traffic, and the connection worked exactly as intended.
 
-Looking forward, preventing this category of incident — DoS and DDoS attacks especially — comes down to two things: proper firewall rules with port filtering, and network segmentation. Segmentation in particular limits how far an attack like this can spread even if it does get through, since it keeps critical systems isolated from the parts of the network most exposed to external traffic.
+### After the attack began — the flood
 
-## Respond
+Shortly after, the logs show a sudden surge of SYN packets, this time originating from `203.0.113.0` — an IP with no prior legitimate presence on the system. Instead of completing handshakes like the earlier traffic, these SYN requests just kept coming, tying up server resources waiting on connections that were never meant to complete.
 
-Once the incident was identified, the response focused on containment and hardening: port filtering, multi-factor authentication (MFA), and new firewall rules specifically aimed at stopping ICMP floods, on top of the IDS/IPS systems already in place.
+The effect was gradual but decisive: the server slowed under the load and eventually went down entirely, taking the organization's operations offline. Without backups or a way to quickly restore state, this kind of outage isn't just an inconvenience — it can mean real, lasting operational and financial damage while systems are rebuilt from scratch.
 
-The bigger lesson here was a reminder that no network or system is ever fully airtight — even a small, easily-overlooked gap (like an unconfigured firewall rule) can be exploited to real effect. That's part of why regular penetration testing matters: it's a way to proactively find these weaknesses before an attacker does.
+## Recommendations
 
-## Recover
+To prevent this type of attack going forward:
 
-The incident management team brought the network back online by:
-
-1. Blocking all incoming ICMP packets at the firewall
-2. Taking non-critical network services offline temporarily to reduce load and exposure
-3. Restoring critical services once the threat was contained
-
-The two-hour compromise was resolved successfully, with all critical services back up and running.
+- **Next-generation firewall (NGFW)** — to inspect traffic more intelligently than a traditional firewall and catch flood patterns before they overwhelm the server.
+- **Port filtering** — to limit which ports are reachable and reduce the attack surface available to flood.
+- **Network segmentation** — so that even if one segment is hit, critical systems elsewhere on the network stay isolated and operational.
+- **IDS/IPS** — to actively detect and block anomalous traffic patterns like a SYN flood as the first line of defense, rather than finding out only after the server has already gone down.
 
 ## Key Takeaway
 
-A single unconfigured firewall setting was enough to bring down the network for two hours. The fixes here — rate limiting, IP verification, monitoring, IDS/IPS, and segmentation — all point at the same underlying principle: perimeter defenses need to be actively configured and tested, not just installed and assumed to be working. Regular pentesting and traffic monitoring are what catch these gaps before they turn into incidents.
+The giveaway here wasn't the SYN packets themselves — those are a completely normal part of every TCP handshake. It was the *volume*, paired with a source IP that had no established legitimate history on the network. That's the pattern to watch for: not just "are SYN requests happening" but "is the number of incomplete handshakes spiking from an unfamiliar source." Catching that shift early, via IDS/IPS and traffic monitoring, is what turns a potential outage into a blocked attempt.
