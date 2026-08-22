@@ -210,7 +210,7 @@ Typed in a couple of lines, then saved and exited with `CTRL+X`, confirmed the s
 **Takeaway:** `mkdir`, `rm`, `mv`, `touch`, and basic nano usage round out the file management side of working in a shell. Combined with navigation and grep from the earlier labs, this covers a decent chunk of what you'd actually be doing day to day investigating or organizing files on a Linux system with no GUI to fall back on.
 
 ---
-#Terms and definitions:
+# Terms and definitions
 
 Absolute file path: The full file path, which starts from the root
 
