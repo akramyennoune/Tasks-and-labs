@@ -211,7 +211,7 @@ Typed in a couple of lines, then saved and exited with `CTRL+X`, confirmed the s
 
 ---
 
-# Perform a SQL Query — Google Cybersecurity Certificate
+# Perform a SQL Query — 
 
 ## Overview
 As part of the **Databases and SQL** module in Google's Cybersecurity Certificate, I used SQL to investigate two aspects of a fictional organization's security posture:
@@ -294,5 +294,105 @@ By default, `ORDER BY` sorts ascending — so the oldest `OS_patch_date` values 
 - `SELECT column1, column2 FROM table;` retrieves only the fields needed for the task — a small habit that keeps output readable when working with large security datasets.
 - Reviewing raw login data (location, timestamp) is a first step in spotting anomalies before applying more advanced filtering (`WHERE`, `AND`/`OR`).
 - `ORDER BY` turns a flat table into a prioritized list — useful for triage tasks like "which machines are most overdue for patching" or "which logins happened most recently."
+
+---
+
+# Filter a SQL Query — 
+
+## Overview
+This lab built on basic `SELECT` statements by introducing **filters** — using `WHERE` and `LIKE` to narrow query results to exactly the records needed. As a security analyst, being able to pull a targeted subset of data (rather than scanning an entire table) is essential for tasks like patch management, compliance notices, and incident response.
+
+The scenario: gather specific information about employees, their machines, and departments to support running updates, posting a privacy notice, and alerting an employee about a machine issue.
+
+## Database Schema
+
+I started by running `DESCRIBE` on both tables to confirm exact column names and types before writing any queries:
+
+```sql
+DESCRIBE machines;
+DESCRIBE employees;
+```
+
+`DESCRIBE` returns each column's name and data type without pulling any rows — a quick way to avoid typos in a `SELECT` statement.
+
+## Task 1: List All Organization Machines
+
+First, I pulled a baseline list of every machine and its operating system:
+
+```sql
+SELECT device_id, operating_system
+FROM machines;
+```
+
+**Result:** 200 rows returned — the full inventory of organization machines.
+
+## Task 2: Retrieve Machines Running OS 2
+
+Machines running `OS 2` needed an update, so I filtered the `machines` table down to just that operating system using a `WHERE` clause:
+
+```sql
+SELECT device_id, operating_system
+FROM machines
+WHERE operating_system = 'OS 2';
+```
+
+**Result:** 80 machines were running OS 2 — this is the exact list IT would use to schedule the update.
+
+**Note on syntax:** string values (like `'OS 2'`) must be wrapped in single quotes, while column names (like `operating_system`) are never quoted. Every statement also needs a closing semicolon or the shell keeps waiting for more input.
+
+## Task 3: List Employees in Specific Departments
+
+A confidential-information notice needed to go out to two departments, so I queried `employees` filtered by department.
+
+**Finance department:**
+```sql
+SELECT *
+FROM employees
+WHERE department = 'Finance';
+```
+The first row returned had `employee_id` **1003**.
+
+**Sales department:**
+```sql
+SELECT *
+FROM employees
+WHERE department = 'Sales';
+```
+**Result:** 33 employees work in Sales.
+
+## Task 4: Identify Employee Machines
+
+A machine in office `South-109` was reported faulty, and I needed to identify the employee using it before escalating to the wider South building.
+
+**Single office lookup:**
+```sql
+SELECT *
+FROM employees
+WHERE office = 'South-109';
+```
+**Result:** the employee using that office is **jlansky**.
+
+**Building-wide lookup with `LIKE`:**
+
+Since all South building offices follow the pattern `South-###`, I used `LIKE` with a wildcard (`%`) instead of an exact match to catch every office in that building:
+
+```sql
+SELECT *
+FROM employees
+WHERE office LIKE 'South%';
+```
+
+The `%` acts as a wildcard for any number of characters. Placement matters:
+- `'South%'` — matches anything *starting* with "South" (e.g., `South-109`, `South-210`)
+- `'%South'` — matches anything *ending* with "South"
+- `'%South%'` — matches "South" appearing *anywhere* in the value
+
+**Result:** the first employee listed in the South building belongs to the **Finance** department.
+
+## Key Takeaways
+- `WHERE` narrows a query to only the rows that meet a specific condition — critical for isolating actionable data (e.g., only the machines that need patching) instead of manually scanning a full table.
+- String values in `WHERE` clauses must be single-quoted; column and table names are not.
+- `LIKE` with `%` wildcards enables pattern matching for cases where an exact match won't work — such as grouping all offices in a building by a shared naming convention.
+- Running `DESCRIBE` before querying an unfamiliar table saves time and avoids errors from mistyped column names.
 
 ---
