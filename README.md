@@ -65,7 +65,7 @@ Lessons-learned reporting
 
 
 
-### 5. [Linux-commands](./Linux-commands.md)
+### 5. [Linux-and-SQL-commands](./Linux-and-SQL-commands.md)
 
 
 
