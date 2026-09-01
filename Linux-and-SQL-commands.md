@@ -396,3 +396,101 @@ The `%` acts as a wildcard for any number of characters. Placement matters:
 - Running `DESCRIBE` before querying an unfamiliar table saves time and avoids errors from mistyped column names.
 
 ---
+
+Overview
+
+This lab extended basic filtering by introducing comparison operators for numeric and date/time data — essential for a security analyst investigating an incident timeline. The scenario: narrow down log_in_attempts records to a specific date range and time window as part of investigating a security incident.
+
+Operators used in this lab:
+
+Operator	Meaning
+=	equal
+>	greater than
+<	less than
+<>	not equal to
+>=	greater than or equal to
+<=	less than or equal to
+Task 1: Retrieve Login Attempts After a Certain Date
+
+Strictly after a date:
+
+sql
+SELECT *
+FROM log_in_attempts
+WHERE login_date > '2022-05-09';
+
+Result: 134 login attempts were made after 2022-05-09.
+
+On or after a date:
+
+sql
+SELECT *
+FROM log_in_attempts
+WHERE login_date >= '2022-05-09';
+
+Result: 165 login attempts were made on or after 2022-05-09 — the extra records represent attempts made on 2022-05-09 itself, which the strict > in the first query excluded.
+
+Task 2: Retrieve Logins in a Date Range
+
+To narrow the investigation to a tighter window, I used BETWEEN ... AND ... to bound the search between two dates:
+
+sql
+SELECT *
+FROM log_in_attempts
+WHERE login_date BETWEEN '2022-05-09' AND '2022-05-11';
+
+Result: 123 login attempts fell between 2022-05-09 and 2022-05-11.
+
+Note: BETWEEN is inclusive on both ends — it returns records matching the start and end dates as well as everything in between.
+
+Task 3: Investigate Logins at Certain Times
+
+The organization's typical work hours start at 07:00:00, so login attempts before that time are worth reviewing for anomalies.
+
+All logins before working hours:
+
+sql
+SELECT *
+FROM log_in_attempts
+WHERE login_time < '07:00:00';
+
+The fifth record returned had the username eraab.
+
+Narrowing to a one-hour window:
+
+sql
+SELECT *
+FROM log_in_attempts
+WHERE login_time BETWEEN '06:00:00' AND '07:00:00';
+
+The earliest login attempt in that window occurred at 06:01:31.
+
+Note: time values, like dates, are placed in single quotes since they're treated as string literals in the query.
+
+Task 4: Investigate Logins by Event ID
+
+Finally, I filtered on event_id — a numeric column, so values here are not wrapped in quotes.
+
+Event IDs of 100 or higher:
+
+sql
+SELECT event_id, username, login_date
+FROM log_in_attempts
+WHERE event_id >= 100;
+
+The third result returned had a login_date of 2022-05-09.
+
+Narrowing to a specific ID range:
+
+sql
+SELECT event_id, username, login_date
+FROM log_in_attempts
+WHERE event_id BETWEEN 100 AND 150;
+
+The seventh result returned had the username bisles.
+
+Key Takeaways
+Comparison operators (>, <, >=, <=) let you filter numeric and date/time data with precision — critical when reconstructing an incident timeline down to the minute.
+BETWEEN ... AND ... is inclusive of both boundary values, and is more readable than chaining two separate comparisons.
+Date and time values are treated as strings and need single quotes; numeric values (like event_id) do not.
+Narrowing a query step by step — first a broad date filter, then a tighter time window, then specific event IDs — mirrors how a real investigation progressively focuses on the relevant data.
