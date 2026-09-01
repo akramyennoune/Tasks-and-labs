@@ -210,43 +210,89 @@ Typed in a couple of lines, then saved and exited with `CTRL+X`, confirmed the s
 **Takeaway:** `mkdir`, `rm`, `mv`, `touch`, and basic nano usage round out the file management side of working in a shell. Combined with navigation and grep from the earlier labs, this covers a decent chunk of what you'd actually be doing day to day investigating or organizing files on a Linux system with no GUI to fall back on.
 
 ---
-# Terms and definitions
 
-Absolute file path: The full file path, which starts from the root
+# Perform a SQL Query — Google Cybersecurity Certificate
 
-Argument (Linux): Specific information needed by a command
+## Overview
+As part of the **Databases and SQL** module in Google's Cybersecurity Certificate, I used SQL to investigate two aspects of a fictional organization's security posture:
 
-Authentication: The process of verifying who someone is
+1. **Device patch status** — identifying which employee machines needed an OS update.
+2. **Login activity** — reviewing the `log_in_attempts` table for signs of unusual or unauthorized access.
 
-Authorization: The concept of granting access to specific resources in a system
+The goal was to practice writing basic `SELECT` and `ORDER BY` statements — foundational skills for a SOC analyst who needs to pull and sort security-relevant data from a database quickly.
 
-Bash: The default shell in most Linux distributions
+## Database Schema
 
-Command: An instruction telling the computer to do something
+**`machines`** — hardware and patch information
 
-File path: The location of a file or directory
+| Column | Description |
+|---|---|
+| `device_id` | Unique identifier for the device |
+| `operating_system` | OS running on the device |
+| `email_client` | Email client installed |
+| `OS_patch_date` | Date the OS was last patched |
+| `employee_id` | Employee assigned to the device |
 
-Filesystem Hierarchy Standard (FHS): The component of the Linux OS that organizes data
+**`log_in_attempts`** — user login activity
 
-Filtering: Selecting data that match a certain condition
+| Column | Description |
+|---|---|
+| `event_id` | Unique identifier for the login event |
+| `username` | User attempting to log in |
+| `login_date` | Date of the login attempt |
+| `login_time` | Time of the login attempt |
+| `country` | Country the attempt originated from |
+| `ip_address` | IP address of the attempt |
+| `success` | Whether the attempt succeeded (1/0) |
 
-nano: A command-line file editor that is available by default in many Linux distributions
+## Task 1: Identify Devices Needing an Update
 
-Options: Input that modifies the behavior of a command
+To see which machines needed patching, I queried the relevant columns from `machines` rather than pulling every field with `SELECT *` — narrowing the columns keeps the output focused on what's actually needed for the update decision.
 
-Permissions: The type of access granted for a file or directory
+```sql
+SELECT device_id, operating_system, OS_patch_date
+FROM machines;
+```
 
-Principle of least privilege: The concept of granting only the minimal access and authorization required to complete a task or function
+**Why these columns:** `device_id` identifies the machine, `operating_system` shows what's installed, and `OS_patch_date` tells us how current (or stale) the patch level is.
 
-Relative file path: A file path that starts from the user's current directory
+## Task 2: Investigate Login Activity
 
-Root directory: The highest-level directory in Linux
+### Step 1 — Check login locations
+The organization only expects login activity from the **United States, Canada, or Mexico**. To check for logins outside those countries, I first pulled the location data:
 
-Root user (or superuser): A user with elevated privileges to modify the system
+```sql
+SELECT event_id, country
+FROM log_in_attempts;
+```
 
-Standard input: Information received by the OS via the command line
+Scanning the results for countries outside the expected set flags potential unauthorized access attempts — e.g., a login originating from a country the organization has no offices or remote staff in is worth escalating.
 
-Standard output: Information returned by the OS through the shell
+### Step 2 — Check for after-hours activity
+Next, I looked at *when* logins occurred, to catch attempts made outside normal business hours:
 
-*Environment: Debian-based Linux, Bash shell*
+```sql
+SELECT username, login_date, login_time
+FROM log_in_attempts;
+```
 
+This isolates the fields needed to cross-reference login timestamps against expected working hours — a common way to spot suspicious activity like credential misuse outside the workday.
+
+## Task 3: Sort Results with `ORDER BY`
+
+To make the patch data easier to triage, I sorted the machines by patch date so the most outdated (and highest-priority) devices surface first:
+
+```sql
+SELECT device_id, operating_system, OS_patch_date
+FROM machines
+ORDER BY OS_patch_date;
+```
+
+By default, `ORDER BY` sorts ascending — so the oldest `OS_patch_date` values (the machines most overdue for an update) appear at the top of the results, making it easy to prioritize which devices IT should patch first.
+
+## Key Takeaways
+- `SELECT column1, column2 FROM table;` retrieves only the fields needed for the task — a small habit that keeps output readable when working with large security datasets.
+- Reviewing raw login data (location, timestamp) is a first step in spotting anomalies before applying more advanced filtering (`WHERE`, `AND`/`OR`).
+- `ORDER BY` turns a flat table into a prioritized list — useful for triage tasks like "which machines are most overdue for patching" or "which logins happened most recently."
+
+---
