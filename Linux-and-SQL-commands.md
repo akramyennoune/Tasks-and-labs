@@ -414,7 +414,7 @@ Task 1: Retrieve Login Attempts After a Certain Date
 
 Strictly after a date:
 
-sql
+```sql
 SELECT *
 FROM log_in_attempts
 WHERE login_date > '2022-05-09';
@@ -423,7 +423,7 @@ Result: 134 login attempts were made after 2022-05-09.
 
 On or after a date:
 
-sql
+```sql
 SELECT *
 FROM log_in_attempts
 WHERE login_date >= '2022-05-09';
@@ -434,7 +434,7 @@ Task 2: Retrieve Logins in a Date Range
 
 To narrow the investigation to a tighter window, I used BETWEEN ... AND ... to bound the search between two dates:
 
-sql
+```sql
 SELECT *
 FROM log_in_attempts
 WHERE login_date BETWEEN '2022-05-09' AND '2022-05-11';
@@ -449,7 +449,7 @@ The organization's typical work hours start at 07:00:00, so login attempts befor
 
 All logins before working hours:
 
-sql
+```sql
 SELECT *
 FROM log_in_attempts
 WHERE login_time < '07:00:00';
@@ -458,7 +458,7 @@ The fifth record returned had the username eraab.
 
 Narrowing to a one-hour window:
 
-sql
+```sql
 SELECT *
 FROM log_in_attempts
 WHERE login_time BETWEEN '06:00:00' AND '07:00:00';
