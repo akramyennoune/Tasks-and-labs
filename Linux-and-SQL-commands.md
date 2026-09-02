@@ -494,3 +494,91 @@ Comparison operators (>, <, >=, <=) let you filter numeric and date/time data wi
 BETWEEN ... AND ... is inclusive of both boundary values, and is more readable than chaining two separate comparisons.
 Date and time values are treated as strings and need single quotes; numeric values (like event_id) do not.
 Narrowing a query step by step — first a broad date filter, then a tighter time window, then specific event IDs — mirrors how a real investigation progressively focuses on the relevant data.
+
+---
+
+## Overview
+This lab moved from single-condition filters to **combined filters** using `AND`, `OR`, and `NOT` — the operators that let a security analyst express compound investigative criteria (e.g., "failed AND after hours," "Finance OR Sales," "everyone except IT"). The scenario continued the login-activity and employee-machine investigation from the earlier labs.
+
+## Task 1: Retrieve After-Hours Failed Login Attempts
+
+The team needed failed logins that occurred after business hours (18:00). This required combining two conditions with `AND`:
+
+```sql
+SELECT *
+FROM log_in_attempts
+WHERE login_time > '18:00' AND success = 0;
+```
+
+**Result:** 19 failed login attempts occurred after 18:00.
+
+**Note:** `success` is a Boolean column (`1` = TRUE, `0` = FALSE) stored as MySQL's native Boolean representation, so `0` is written without quotes — unlike string or date values.
+
+## Task 2: Retrieve Login Attempts on Specific Dates
+
+To investigate a suspicious event on `2022-05-09`, the team also wanted the day before it, `2022-05-08`. Since a single row can't match two different dates at once, this called for `OR` rather than `AND`:
+
+```sql
+SELECT *
+FROM log_in_attempts
+WHERE login_date = '2022-05-09' OR login_date = '2022-05-08';
+```
+
+**Result:** 75 login attempts were made across these two days.
+
+## Task 3: Retrieve Login Attempts Outside of Mexico
+
+The `country` column stores Mexican entries inconsistently (`'MEX'` and `'MEXICO'`), so an exact-match filter wouldn't catch both. I combined `NOT` with `LIKE` and a wildcard pattern to exclude anything starting with "MEX":
+
+```sql
+SELECT *
+FROM log_in_attempts
+WHERE NOT country LIKE 'MEX%';
+```
+
+**Result:** 144 login attempts originated outside of Mexico.
+
+## Task 4: Retrieve Employees in Marketing (East Building)
+
+For the machine-update tasks, I needed employees who satisfied **two conditions at once**: in the Marketing department *and* located in the East building. Both conditions had to hold for the same row, so this used `AND` together with `LIKE` for the office-naming pattern:
+
+```sql
+SELECT *
+FROM employees
+WHERE department = 'Marketing' AND office LIKE 'East%';
+```
+
+**Result:** the first employee returned had the username **elarson**.
+
+## Task 5: Retrieve Employees in Finance or Sales
+
+A separate update needed to reach anyone in *either* Finance or Sales. Even though both conditions check the same column, each condition has to be written out in full with `OR`:
+
+```sql
+SELECT *
+FROM employees
+WHERE department = 'Finance' OR department = 'Sales';
+```
+
+**Result:** the first employee in the Sales department returned was **lrodriqu**.
+
+## Task 6: Retrieve All Employees Not in IT
+
+The final update had already been applied to Information Technology, so the remaining rollout needed everyone *except* that department. `NOT` combined with an equality check handled the exclusion:
+
+```sql
+SELECT *
+FROM employees
+WHERE NOT department = 'Information Technology';
+```
+
+**Result:** 188 employees are outside the Information Technology department.
+
+## Key Takeaways
+- `AND` requires **both** conditions to be true for a row to be returned — used here for compound criteria like "failed AND after hours" or "Marketing AND East building."
+- `OR` requires **either** condition to be true — necessary when checking if a single column could match one of several values (e.g., two possible dates, two possible departments). Each condition must be spelled out in full, even when checking the same column twice.
+- `NOT` inverts a condition, which is often the fastest way to say "everyone except X" without listing every other possible value.
+- Boolean columns (like `success`) are compared with unquoted `1`/`0`, distinguishing them from quoted string or date comparisons.
+- Combining `LIKE` with `AND`/`NOT` handles real-world data inconsistencies (like `'MEX'` vs `'MEXICO'`) that an exact match would miss.
+
+---
